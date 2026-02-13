@@ -9,4 +9,4 @@ def create_bucket(bucket_name, location="US-CENTRAL1", storage_class="STANDARD")
 
 
 if __name__ == "__main__":
-    create_bucket("gcs_bucket_nuevo2")
+    create_bucket("gcs-bucket-engineer-06")
