@@ -9,6 +9,7 @@ default_args = {
     'retries': 1
 }
 
+
 dag = DAG(
     'wordcount_dataflow',
     default_args=default_args,
