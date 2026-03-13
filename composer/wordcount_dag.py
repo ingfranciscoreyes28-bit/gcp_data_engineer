@@ -9,7 +9,6 @@ default_args = {
     'retries': 1
 }
 
-
 dag = DAG(
     'wordcount_dataflow',
     default_args=default_args,
@@ -20,9 +19,8 @@ dag = DAG(
 
 dataflow_task = DataflowTemplatedJobStartOperator(
     task_id='ejecutar_wordcount',
-    template='gs://gcs-bucket-engineer-06/templates/wordcount_template',
+    template='gs://gcp-bucket-engineer-07/templates/wordcount_template',
     location='us-central1',
-    project_id='gcp-data-engineer-06-487123',
+    project_id='gcp-data-engineer-07-490104',
     dag=dag,
 )
-

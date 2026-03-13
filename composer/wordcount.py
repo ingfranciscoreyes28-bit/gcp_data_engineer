@@ -11,14 +11,14 @@ def run():
         runner="DataflowRunner",
 
         # ID del proyecto en GCP
-        project="gcp-data-engineer-06",
+        project="gcp-data-engineer-07",
 
         # Región donde se ejecutaría Dataflow
         region="us-central1",
 
         # Bucket temporal que usa Dataflow
         # OJO: este bucket es el que genera el aviso de Soft Delete
-        temp_location="gs://gcs-bucket-engineer-06/temp"
+        temp_location="gs://gcp-bucket-engineer-07/temp"
     )
     # DEFINICIÓN DEL PIPELINE
     # Crea el pipeline con las opciones anteriores
@@ -34,7 +34,7 @@ def run():
             )
             | "Contar palabras" >> beam.combiners.Count.PerElement()
             | "Guardar resultados" >> beam.io.WriteToText(
-                "gs://gcs-bucket-engineer-06/output/wordcount"
+                "gs://gcp-bucket-engineer-07/output/wordcount"
             )
         )
         print("Pipeline ejecutado correctamente")

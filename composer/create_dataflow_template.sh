@@ -1,12 +1,12 @@
-python wordcount.py --runner DataflowRunner --project gcp-data-engineer-06- --region us-central1 --staging_location gs://gcs-bucket-engineer-06/staging/ --temp_location gs://gcs-bucket-engineer-06/temp/ --template_location gs://gcs-bucket-engineer-06/templates/wordcount_template
+python wordcount.py --runner DataflowRunner --project gcp-data-engineer-07- --region us-central1 --staging_location gs://gcp-bucket-engineer-07/staging/ --temp_location gs://gcp-bucket-engineer-07/temp/ --template_location gs://gcp-bucket-engineer-07/templates/wordcount_template
 
 python3 wordcount.py \
     --runner DataflowRunner \
-    --project gcp-data-engineer-06 \
+    --project gcp-data-engineer-07 \
     --region us-central1 \
-    --staging_location gs://gcs-bucket-engineer-06/staging/ \
-    --temp_location gs://gcs-bucket-engineer-06/temp/ \
-    --template_location gs://gcs-bucket-engineer-06/templates/wordcount_template
+    --staging_location gs://gcp-bucket-engineer-07/staging/ \
+    --temp_location gs://gcp-bucket-engineer-07/temp/ \
+    --template_location gs://gcp-bucket-engineer-07/templates/wordcount_template
 
 
 
