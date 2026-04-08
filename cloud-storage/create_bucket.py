@@ -1,4 +1,5 @@
 from google.cloud import storage
+import sys
 
 def create_bucket(bucket_name, location="US-CENTRAL1", storage_class="STANDARD"):
     storage_client = storage.Client()
@@ -7,6 +8,10 @@ def create_bucket(bucket_name, location="US-CENTRAL1", storage_class="STANDARD")
     new_bucket = storage_client.create_bucket(bucket, location=location)
     print(f"Bucket {new_bucket.name} created in {new_bucket.location} with class {new_bucket.storage_class}")
 
-
 if __name__ == "__main__":
-    create_bucket("gcp-bucket-engineer-07")
+    if len(sys.argv) < 2:
+        print("Uso: python create_bucket.py <bucket_name>")
+        sys.exit(1)
+
+    bucket_name = sys.argv[1]
+    create_bucket(bucket_name)

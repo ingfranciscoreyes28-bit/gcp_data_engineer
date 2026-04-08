@@ -21,6 +21,6 @@ dataflow_task = DataflowTemplatedJobStartOperator(
     task_id='ejecutar_wordcount',
     template='gs://gcp-bucket-engineer-07/templates/wordcount_template',
     location='us-central1',
-    project_id='gcp-data-engineer-07-490104',
+    project_id='gcp-data-engineer-08-490105',
     dag=dag,
 )

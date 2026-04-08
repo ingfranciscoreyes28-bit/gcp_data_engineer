@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Ordenes</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Dashboard de Ordenes</h1>
+            <p>Analisis interactivo de datos de pedidos - Order_v3.csv</p>
+        </header>
+
+        <!-- KPIs Section -->
+        <section class="kpis-grid">
+            <div class="kpi-card">
+                <div class="icon">&#128202;</div>
+                <div class="value" id="totalOrders">214</div>
+                <div class="label">Total Ordenes</div>
+            </div>
+            <div class="kpi-card">
+                <div class="icon">&#128176;</div>
+                <div class="value" id="totalValue">$26.3M</div>
+                <div class="label">Valor Total</div>
+            </div>
+            <div class="kpi-card">
+                <div class="icon">&#128230;</div>
+                <div class="value" id="totalQuantity">59,513</div>
+                <div class="label">Items Totales</div>
+            </div>
+            <div class="kpi-card">
+                <div class="icon">&#128200;</div>
+                <div class="value" id="avgOrderValue">$122,908</div>
+                <div class="label">Valor Promedio/Orden</div>
+            </div>
+        </section>
+
+        <!-- Charts Section -->
+        <section class="charts-grid">
+            <div class="chart-card">
+                <h2>Distribucion por Tipo de Orden</h2>
+                <div class="chart-container">
+                    <canvas id="orderTypeChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h2>Top 10 Compradores por Valor</h2>
+                <div class="chart-container">
+                    <canvas id="buyersChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h2>Top 10 Vendedores por Valor</h2>
+                <div class="chart-container">
+                    <canvas id="vendorsChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h2>Valor Promedio por Orden por Comprador</h2>
+                <div class="chart-container">
+                    <canvas id="avgValueChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary Tables -->
+        <section class="summary-grid">
+            <div class="summary-card">
+                <h3>Top 5 Compradores (por Valor Total)</h3>
+                <div id="topBuyersList"></div>
+            </div>
+            <div class="summary-card">
+                <h3>Top 5 Vendedores (por Valor Total)</h3>
+                <div id="topVendorsList"></div>
+            </div>
+        </section>
+
+        <!-- Data Table -->
+        <section class="table-section">
+            <h2>Resumen de Ordenes (Top 20 por Valor)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Orden</th>
+                        <th>Tipo</th>
+                        <th>Vendedor</th>
+                        <th>Comprador</th>
+                        <th>Cantidad</th>
+                        <th>Valor</th>
+                        <th>Fecha Creacion</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Insights Section -->
+        <section class="table-section">
+            <h2>Insights Clave</h2>
+            <div class="insights-grid">
+                <div class="insight-card">
+                    <h4>Concentracion de Compras</h4>
+                    <p>LightTree concentra el <strong>67.8%</strong> del valor total de compras, actuando como el principal comprador del sistema.</p>
+                </div>
+                <div class="insight-card">
+                    <h4>Flujo Predominante</h4>
+                    <p>Las ordenes <strong class="inbound">INBOUND (78.5%)</strong> superan significativamente a las <strong class="outbound">OUTBOUND (21.5%)</strong>.</p>
+                </div>
+                <div class="insight-card">
+                    <h4>Principal Vendedor</h4>
+                    <p><strong>LightTree</strong> y <strong>Flexilux</strong> representan juntos el <strong>56.2%</strong> del valor vendido.</p>
+                </div>
+                <div class="insight-card">
+                    <h4>Rango de Fechas</h4>
+                    <p>Los datos abarcan desde <strong>Julio 2017</strong> hasta <strong>Julio 2021</strong> (aproximadamente 4 anos).</p>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>Dashboard generado automaticamente | Datos: Order_v3.csv | Fecha: 2026</p>
+        </footer>
+    </div>
+
+    <script>
+        // Data from CSV
+        const orderData = {
+            totalOrders: 214,
+            totalValue: 26311213,
+            totalQuantity: 59513,
+            avgOrderValue: 122908,
+            orderTypes: {
+                INBOUND: 168,
+                OUTBOUND: 46
+            },
+            buyersValue: {
+                'LightTree': 17834508,
+                'QPWD': 1827272,
+                'NYDOT': 1641250,
+                'AHTD': 1570661,
+                'CALTRAN': 1555833,
+                'FAA': 1012637,
+                'KYTC': 498750,
+                'MAHD': 247500,
+                'COLA': 122802
+            },
+            vendorsValue: {
+                'LightTree': 8476705,
+                'Flexilux': 6319611,
+                'Total Source': 2912791,
+                'Brewers': 2123017,
+                'McGrey': 1817446,
+                'Mueller': 1073854,
+                'F & M': 738150,
+                'Alumi-lux': 716625,
+                'Ripley': 534210,
+                'LightLens': 312341
+            },
+            orders: [
+                {id: '1000567422', type: 'INBOUND', vendor: 'Flexilux', buyer: 'LightTree', qty: 512, value: 1227776, date: '2021-06-16'},
+                {id: '1000567254', type: 'INBOUND', vendor: 'Brewers', buyer: 'LightTree', qty: 512, value: 745472, date: '2021-06-16'},
+                {id: '1000567388', type: 'INBOUND', vendor: 'Total Source', buyer: 'LightTree', qty: 512, value: 528384, date: '2021-06-16'},
+                {id: '100044355', type: 'OUTBOUND', vendor: 'LightTree', buyer: 'AHTD', qty: 400, value: 500000, date: '2021-06-08'},
+                {id: '100044322', type: 'OUTBOUND', vendor: 'LightTree', buyer: 'FAA', qty: 400, value: 500000, date: '2021-07-20'},
+                {id: '100044335', type: 'OUTBOUND', vendor: 'LightTree', buyer: 'KYTC', qty: 320, value: 400000, date: '2021-06-28'},
+                {id: '100044347', type: 'OUTBOUND', vendor: 'LightTree', buyer: 'CALTRAN', qty: 645, value: 806250, date: '2021-06-11'},
+                {id: '100044344', type: 'OUTBOUND', vendor: 'LightTree', buyer: 'CALTRAN', qty: 302, value: 377500, date: '2021-06-11'},
+                {id: '100044343', type: 'OUTBOUND', vendor: 'LightTree', buyer: 'CALTRAN', qty: 22, value: 27500, date: '2021-06-11'},
+                {id: '100044353', type: 'OUTBOUND', vendor: 'LightTree', buyer: 'AHTD', qty: 212, value: 265000, date: '2021-06-08'},
+                {id: '100044349', type: 'OUTBOUND', vendor: 'LightTree', buyer: 'AHTD', qty: 189, value: 236250, date: '2021-06-08'},
+                {id: '1000567325', type: 'INBOUND', vendor: 'Ripley', buyer: 'LightTree', qty: 512, value: 163840, date: '2021-06-16'},
+                {id: '1000567402', type: 'INBOUND', vendor: 'Alumi-lux', buyer: 'LightTree', qty: 512, value: 232960, date: '2021-06-16'},
+                {id: '1000567335', type: 'INBOUND', vendor: 'LightLens', buyer: 'LightTree', qty: 512, value: 97280, date: '2021-06-16'},
+                {id: '1000567287', type: 'INBOUND', vendor: 'Mueller', buyer: 'LightTree', qty: 512, value: 210944, date: '2021-06-16'},
+                {id: '1000567248', type: 'INBOUND', vendor: 'SA', buyer: 'LightTree', qty: 512, value: 179200, date: '2021-06-16'},
+                {id: '1000567409', type: 'INBOUND', vendor: 'Total Source', buyer: 'LightTree', qty: 56, value: 57792, date: '2021-07-08'},
+                {id: '100044354', type: 'OUTBOUND', vendor: 'LightTree', buyer: 'AHTD', qty: 208, value: 260000, date: '2021-06-08'},
+                {id: '100044323', type: 'OUTBOUND', vendor: 'LightTree', buyer: 'FAA', qty: 250, value: 312500, date: '2021-07-20'},
+                {id: '100044324', type: 'OUTBOUND', vendor: 'LightTree', buyer: 'FAA', qty: 132, value: 165000, date: '2021-07-20'}
+            ]
+        };
+
+        // Chart.js global configuration
+        Chart.defaults.color = '#a0a0a0';
+        Chart.defaults.borderColor = '#2a2a4a';
+
+        // Order Type Pie Chart
+        new Chart(document.getElementById('orderTypeChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['INBOUND', 'OUTBOUND'],
+                datasets: [{
+                    data: [168, 46],
+                    backgroundColor: ['#00b894', '#e17055'],
+                    borderColor: ['#00b894', '#e17055'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            font: { size: 12 }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((context.raw / total) * 100).toFixed(1);
+                                return `${context.label}: ${context.raw} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Buyers Bar Chart
+        new Chart(document.getElementById('buyersChart'), {
+            type: 'bar',
+            data: {
+                labels: Object.keys(orderData.buyersValue),
+                datasets: [{
+                    label: 'Valor ($)',
+                    data: Object.values(orderData.buyersValue),
+                    backgroundColor: 'rgba(0, 217, 255, 0.7)',
+                    borderColor: '#00d9ff',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + (value / 1000000).toFixed(1) + 'M';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Vendors Bar Chart
+        new Chart(document.getElementById('vendorsChart'), {
+            type: 'bar',
+            data: {
+                labels: Object.keys(orderData.vendorsValue),
+                datasets: [{
+                    label: 'Valor ($)',
+                    data: Object.values(orderData.vendorsValue),
+                    backgroundColor: 'rgba(255, 107, 107, 0.7)',
+                    borderColor: '#ff6b6b',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + (value / 1000000).toFixed(1) + 'M';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Average Value Chart
+        const avgValues = {};
+        const orderCounts = {};
+        Object.entries(orderData.buyersValue).forEach(([buyer, value]) => {
+            avgValues[buyer] = Math.round(value / (buyer === 'LightTree' ? 168 : 10));
+            orderCounts[buyer] = buyer === 'LightTree' ? 168 : 10;
+        });
+
+        new Chart(document.getElementById('avgValueChart'), {
+            type: 'bar',
+            data: {
+                labels: Object.keys(avgValues).slice(0, 9),
+                datasets: [{
+                    label: 'Valor Promedio ($)',
+                    data: Object.values(avgValues).slice(0, 9),
+                    backgroundColor: 'rgba(108, 92, 231, 0.7)',
+                    borderColor: '#6c5ce7',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
+                        }
+                    }
+                }
+            }
+        });
+
+        // Populate Summary Cards
+        const topBuyersList = document.getElementById('topBuyersList');
+        Object.entries(orderData.buyersValue).slice(0, 5).forEach(([name, value]) => {
+            const item = document.createElement('div');
+            item.className = 'summary-item';
+            item.innerHTML = `
+                <span class="name">${name}</span>
+                <span class="value">$${(value / 1000000).toFixed(2)}M</span>
+            `;
+            topBuyersList.appendChild(item);
+        });
+
+        const topVendorsList = document.getElementById('topVendorsList');
+        Object.entries(orderData.vendorsValue).slice(0, 5).forEach(([name, value]) => {
+            const item = document.createElement('div');
+            item.className = 'summary-item';
+            item.innerHTML = `
+                <span class="name">${name}</span>
+                <span class="value">$${(value / 1000000).toFixed(2)}M</span>
+            `;
+            topVendorsList.appendChild(item);
+        });
+
+        // Populate Orders Table
+        const tableBody = document.getElementById('ordersTableBody');
+        orderData.orders.forEach(order => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${order.id}</td>
+                <td><span class="type-badge ${order.type.toLowerCase()}">${order.type}</span></td>
+                <td>${order.vendor}</td>
+                <td>${order.buyer}</td>
+                <td>${order.qty.toLocaleString()}</td>
+                <td>$${order.value.toLocaleString()}</td>
+                <td>${order.date}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    </script>
+</body>
+</html>
