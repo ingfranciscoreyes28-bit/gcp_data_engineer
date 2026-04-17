@@ -1,3 +1,5 @@
+-- para ver dos tablas unidas en una vista(consulta)
+
 CREATE OR REPLACE VIEW ecommerce_dataset.denormalized_view AS
 SELECT
     o.user_id,

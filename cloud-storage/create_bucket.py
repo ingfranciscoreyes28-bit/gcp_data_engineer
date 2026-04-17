@@ -1,17 +1,28 @@
 from google.cloud import storage
+from google.api_core.exceptions import Conflict
 import sys
 
-def create_bucket(bucket_name, location="US-CENTRAL1", storage_class="STANDARD"):
-    storage_client = storage.Client()
-    bucket = storage_client.bucket(bucket_name)
-    bucket.storage_class = storage_class
-    new_bucket = storage_client.create_bucket(bucket, location=location)
-    print(f"Bucket {new_bucket.name} created in {new_bucket.location} with class {new_bucket.storage_class}")
+def create_bucket(bucket_name):
+    client = storage.Client()
+
+    # Verifica si existe
+    if client.lookup_bucket(bucket_name):
+        print(f"⚠️ El bucket '{bucket_name}' ya existe")
+        return
+
+    try:
+        bucket = client.bucket(bucket_name)
+        bucket.storage_class = "STANDARD"
+
+        new_bucket = client.create_bucket(bucket, location="US-CENTRAL1")
+        print(f"✅ Bucket {new_bucket.name} creado")
+    except Conflict:
+        print(f"⚠️ El bucket '{bucket_name}' ya existe (global)")
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Uso: python create_bucket.py <bucket_name>")
-        sys.exit(1)
+    if len(sys.argv) >= 2:
+        name = sys.argv[1]
+    else:
+        name = input("Nombre del bucket: ").strip()
 
-    bucket_name = sys.argv[1]
-    create_bucket(bucket_name)
+    create_bucket(name)
