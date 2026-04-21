@@ -1,4 +1,8 @@
-gsutil mb -l us-central1 gs://ecommerce-datalake-777/
+gsutil mb -l US gs://ecommerce-datalake-pvvnshho/
+
+gsutil cp users.csv gs://ecommerce-datalake-pvvnshho/
+
+gsutil cp orders.csv gs://ecommerce-datalake-pvvnshho/
 
 
 

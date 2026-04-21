@@ -7,4 +7,3 @@ CREATE TABLE ecommerce_dataset.orders (
 );
 
 
-CREATE 
